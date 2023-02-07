@@ -10,7 +10,7 @@ use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
 use std::env::var;
 
-pub async fn create_customer(ddb: &Client, customer: Customer) -> Result<u8, Error> {
+pub async fn create_customer(ddb: &Client, customer: Customer) -> Result<(), Error> {
     let mut item = HashMap::new();
     item.insert("pk".to_string(), AttributeValue::S(customer.pk));
     item.insert("sk".to_string(), AttributeValue::S(customer.sk.to_string()));
@@ -33,10 +33,10 @@ pub async fn create_customer(ddb: &Client, customer: Customer) -> Result<u8, Err
         .set_item(Some(item))
         .send()
         .await?;
-    Ok(1)
+    Ok(())
 }
 
-pub async fn update_customer(ddb: &Client, profile: GithubProfile) -> Result<u8, Error> {
+pub async fn update_customer(ddb: &Client, profile: GithubProfile) -> Result<(), Error> {
     let mut expression_attribute_names = HashMap::new();
     expression_attribute_names.insert("#n".to_string(), "n".to_string());
     expression_attribute_names.insert("#img".to_string(), "img".to_string());
@@ -69,14 +69,14 @@ pub async fn update_customer(ddb: &Client, profile: GithubProfile) -> Result<u8,
         .send()
         .await?;
 
-    Ok(1)
+    Ok(())
 }
 
 async fn toggle_customer(
     ddb: &Client,
     customer_id: String,
     disabled: bool,
-) -> Result<u8, Error> {
+) -> Result<(), Error> {
     let mut expression_attribute_names = HashMap::new();
     expression_attribute_names.insert("#ua".to_string(), "ua".to_string());
     expression_attribute_names.insert("#dis".to_string(), "dis".to_string());
@@ -100,14 +100,14 @@ async fn toggle_customer(
         .send()
         .await?;
 
-    Ok(1)
+    Ok(())
 }
 
-pub async fn disable_customer(ddb: &Client, customer_id: String) -> Result<u8, Error> {
+pub async fn disable_customer(ddb: &Client, customer_id: String) -> Result<(), Error> {
     toggle_customer(ddb, customer_id, true).await
 }
 
-pub async fn enable_customer(ddb: &Client, customer_id: String) -> Result<u8, Error> {
+pub async fn enable_customer(ddb: &Client, customer_id: String) -> Result<(), Error> {
     toggle_customer(ddb, customer_id, false).await
 }
 
